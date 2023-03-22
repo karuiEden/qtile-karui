@@ -61,6 +61,7 @@ keys = [
     Key([], "XF86AudioMute", lazy.spawn("pamixer -t")),
     Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
     Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+    Key([mod, "shift"], "s", lazy.spawn("flameshot gui")),
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with
@@ -78,21 +79,26 @@ keys = [
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([alt], "Shift_L",  lazy.widget["keyboardlayout"].next_keyboard()),
-    Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
+    Key([mod], "r", lazy.spawn("rofi -show run")),
 ]
 
-groups = [Group(i) for i in "123456789"]
+groups = [
+    Group("1", label="", layout='monadtall', spawn=["kitty","kitty","kitty cava"]),
+    Group("2", label="", layout='monadtall', spawn=["firefox"], matches=[Match(wm_class=["firefox"])]),
+    Group("3", label="", layout='monadtall', spawn=["telegram-desktop"], matches=[Match(wm_class=["telegram-desktop"])]),
+    Group("4", label="", layout='monadtall', spawn=["thunar"]),
+    Group("5", label="", layout='monadtall'),
+    Group("6", label="", layout='monadtall'),
+    Group("7", label="", layout='monadtall'),
+    Group("8", label="", layout='monadtall'),
+    Group("9", label="", layout='monadtall'),
+]
 
 for i in groups:
     keys.extend(
         [
             # mod1 + letter of group = switch to group
-            Key(
-                [mod],
-                i.name,
-                lazy.group[i.name].toscreen(),
-                desc="Switch to group {}".format(i.name),
-            ),
+            Key([mod], i.name, lazy.group[i.name].toscreen(), desc="Switch to group {}".format(i.name),),
             # mod1 + shift + letter of group = switch to & move focused window to group
             Key(
                 [mod, "shift"],
@@ -108,7 +114,8 @@ for i in groups:
     )
 
 layouts = [
-    layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
+    layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4
+                   ),
     layout.Max(),
     # Try more layouts by unleashing below layouts.
     # layout.Stack(num_stacks=2),
@@ -124,7 +131,7 @@ layouts = [
 ]
 
 widget_defaults = dict(
-    font="sans",
+    font="UbuntuMono Nerd Font",
     fontsize=12,
     padding=3,
 )
@@ -132,12 +139,14 @@ extension_defaults = widget_defaults.copy()
 
 screens = [
     Screen(
-        bottom=bar.Bar(
+        top=bar.Bar(
             [
-                widget.CurrentLayout(),
-                widget.GroupBox(),
+                #widget.CurrentLayout(),
+                widget.GroupBox(background="#00994C", highlight_method='line', highlight_color=['#00994C'], this_screen_border="#990000", this_current_screen_border="#990000", rounded="True"),
+                #widget.TextBox("▶", font="UbuntuMono Nerd Font", fontsize="28"),
                 widget.Prompt(),
-                widget.WindowName(),
+                #widget.WindowName(),
+                widget.Spacer(),
                 widget.Chord(
                     chords_colors={
                         "launch": ("#ff0000", "#ffffff"),
@@ -158,8 +167,8 @@ screens = [
                 widget.QuickExit(),
             ],
             24,
-            # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
-            # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
+             #border_width=[2, 0, 2, 0],  # Draw top and bottom borders
+             #border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
            
             #wallpaper_mode='stretch',
         ),
@@ -201,6 +210,14 @@ auto_minimize = True
 
 # When using the Wayland backend, this can be used to configure input devices.
 wl_input_rules = None
+
+
+@hook.subscribe.startup_once 
+def start_once(): 
+    home = os.path.expanduser('~')
+    subprocess.call([home + '/.config/qtile/autostart.sh'])
+
+
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the

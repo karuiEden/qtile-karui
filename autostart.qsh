@@ -1,0 +1,11 @@
+to_screen(0)
+spawn("kitty")
+spawn("kitty")
+spawn("kitty")
+to_screen(1)
+spawn("firefox")
+to_screen(2)
+spawn("telegram-desktop")
+to_screen(0)
+exit
+
